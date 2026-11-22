@@ -206,7 +206,7 @@
 
   <footer><span id="count"></span> projects · last updated <span id="updated"></span></footer>
 
-<script src="projects.js?v=3"></script>
+<script src="projects.js?v=4"></script>
 <script>
   const grid = document.getElementById("grid");
   const overlay = document.getElementById("overlay");
@@ -289,7 +289,7 @@
     const image = p.image ? `<div class="ibox" data-i="${i}">Loading image…</div>` : "";
     const sizeLabel = n => n >= 1e6 ? `${(n / 1e6).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1e3))} KB`;
     const files = p.files ? `<div class="files">${p.files.map((f, j) =>
-      `<button class="file" data-i="${i}" data-j="${j}">⬇ ${esc(f.name)}<small>${sizeLabel(f.size)}</small></button>`).join("")}</div>` : "";
+      `<button class="file" data-i="${i}" data-j="${j}">${f.type === "application/pdf" ? "📄 Open" : "⬇"} ${esc(f.name)}<small>${sizeLabel(f.size)}</small></button>`).join("")}</div>` : "";
     const video = p.video ? `
       <div class="vbox" data-i="${i}">
         <button class="load">▶ Play video <small>${Math.round(p.video.size / 1e6)} MB</small></button>
@@ -325,16 +325,26 @@
     } catch { box.textContent = "Couldn't load image"; }
   }
 
+  // PDFs open in a new tab (opened right on click so pop-up blockers allow it); other files download
   async function downloadFile(btn, f, key) {
     const label = btn.innerHTML;
+    const win = f.type === "application/pdf" ? window.open("", "_blank") : null;
+    if (win) win.document.title = "Loading " + f.name + "…";
     btn.disabled = true;
+    btn.innerHTML = "Loading…";
     try {
       const url = URL.createObjectURL(await fetchAsset(f, key));
-      const a = Object.assign(document.createElement("a"), { href: url, download: f.name });
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      if (win) win.location.href = url;
+      else {
+        const a = Object.assign(document.createElement("a"), { href: url, download: f.name });
+        document.body.appendChild(a); a.click(); a.remove();
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 120000);
       btn.innerHTML = label;
-    } catch { btn.textContent = "Download failed — retry"; }
+    } catch {
+      if (win) win.close();
+      btn.textContent = "Couldn't load — retry";
+    }
     btn.disabled = false;
   }
 

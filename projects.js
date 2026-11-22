@@ -50,6 +50,22 @@ window.FOLDERS = [
   }
  },
  {
+  "id": "to-do",
+  "name": "To-Do",
+  "color": "#b8f07a",
+  "back": "#d3f7a8",
+  "stickers": [
+   "✅",
+   "📌",
+   "🗒️"
+  ],
+  "count": 1,
+  "enc": {
+   "iv": "5ixRPS3IaWYdz9HZei8b/g==",
+   "ct": "K5Su39rKc7wItE4bXlhe39WqqHtRAvolQQ/s3gqU88m5RTL2rhjW3KDtTWENxXnS/WNSCqfFwNfs41nYrtZh7H4aETlpITiz2susbE3RQPu6QDnN1M+cCyPi0gYkcan5PTVqcGTCviLmoura1cHjAjzWnI92ABK7vGNiG6J/ypHOl+Qbv18pkKlIsQZolDS6c1KodrFgOjAWMzzcmDZCf2ipGuA9fw34AuObzPMy49EcLrP9RxT/Q3p5vm2eMWmiAKfVG2Jf0cGXcmD2l60xritkiOfILdQjWRonvm+WgQXAQZWTIOF2E9i++tQtWhM9HgN/TDjC3lZnp5uQre1Hda55IdeoK68lzqym+i+AhBnFXMSTah+7NSPkhscAtTBL/Vn4/rqySiJluQYLe6aKYR3uWloTV+VFrq/t1L/kVT4zOZ3PEaEZRmH6LGIl+JDa4q3WGN1KdhYsQ82U2Z6v3NFdtBdBwLaTPkLMrzWkYFnTdAAvnAe02NOWiLJ8rSXHYKYFony9tRTG8MPCJNXdeumxlehlqEi85NTqTT4hXqXx0dyjMXROdqg9XhP6bm4W3sUAlRzO3wHCtTBq1NWebxJG1llf16gpk52KObLqS8LlriefBbtBDu8eyOIjPZXEveezOXFFFi4vo8fFAcG2oQGopuH+pDJZCEx8uZ2c1ZASvTvETfL+nFMmMpH8nZsusCs6wpUqe/lg7z2UThYoZp9iGIUgQT7X/f1NOonBBC6GELXIezUjC2y6wr5syUPNYzt/ZMoVTxeWF98d5TU8Ky900tT4qxiCH3tGL3O7O9yVYvQMpNfAriTWZqYUKCkm"
+  }
+ },
+ {
   "id": "web",
   "name": "Web Dev",
   "color": "#7aa2ff",
