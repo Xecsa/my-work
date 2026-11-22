@@ -50,6 +50,22 @@ window.FOLDERS = [
   }
  },
  {
+  "id": "atm",
+  "name": "ATM",
+  "color": "#9fb4d9",
+  "back": "#c3d1ea",
+  "stickers": [
+   "🏧",
+   "💳",
+   "✨"
+  ],
+  "count": 1,
+  "enc": {
+   "iv": "igwbic/3kZ1w8sqI3hWLgQ==",
+   "ct": "Vp2kur88gGv6mxVv1gafiW/zaw6wN/su8U4HaVkOTd0Ucy/NxLQyIlEhSuIFHfzXNB4qoO/abLHioVK9VGUYiaWhLmkpcPA/2Xn4BYrA5jc6Lmk/fMXxF9PsUs9nPXUeuYxyEDOvar9x7el7bQR2HW0DN+IpPYObk1ak79QCRpt1Lpx/SL26WNEcK7NOnpTBBQhiq4IiQwJl459r1w0KO0jLFWho+EpZs+Jyev3Zmqpdv6B1enPm7zCWjo2/yFt5Mrhfj5W0oChEz6s+OyP4+d7aZX6p9+ZWVjrVyYlGkuRNICakNr7mY70YzKpXs4gj2utyrY0WOmIHTnnmBBNW703T5bxMpZcjfJS4OcZ7Ji9asVeYKqmipCTrolO3ktWrOAXgtvMpeBVyAifn3XpWgOE/a9YEWgSWkPhPQ/xDg8owTWXLzRtceJWIruBAlZq8DOITB8qUYXEGuH4OaLvK6NRFTjdnxOrLwn3cvvDEy2dq9yWWjnQo1sAILs0iMg7smnJE230cHa9NM3V1m494aeFg6LEuLkzFqd9CbOtNc5n2Sx3viP2H2NhbnGN0O9kES8vDvTOij8cpbQn3lYx6AqAt06UNaQGN/IY/k/bWXtGvm8YYxJtC1d8b7NEcqMuifhCsOW7sZ+zzejBrowh3jbEJIzFR51GwuGKPir6zQfpHHRwN17ZXUH0Cls5J0Zk4EK6Es5ACXPEADeA14e08vX1nqxDpqSP0IWzGry8baBwsFCB8hEsQn1Gi5NOuw3F4tPT+0qQX1vZ+MKBVdwiascoVuA0QjUXWER8jHC1St3YCw1Mw/aEfE/MmefT3WaPY6+mw8ddRoSSduDFkctfyZ276jg6aBeMFxiJM8y3tDawT+VBTPv/F4XGsA1yzqSS/yvYvlnVIYAfdNe8++CvHr4vw8ZmScLf7PeYARI2n/0zWKK/AmiEGzNQw5csgkx1ocO243PCPUu+qEEKFHniGaXmGL+Ke3mlvGLz5TQvU03Zma0VodabAw7w7cuKsro+oJUxiR8OQ9DS7wZI5WYess20P959CvvsbkVxOsIHLs+Am/gV+LvfT13+NqmeruJ7fIbhssn91e35/N89HTcXFzOhyPpee7ddrLbhPK3FXazFrfp6/SrnLYmql2YlJMRGGEK02Me/5923Q9yGdfCz7BAkV2ku55QYKpmy9o+S7Jaw="
+  }
+ },
+ {
   "id": "to-do",
   "name": "To-Do",
   "color": "#b8f07a",
