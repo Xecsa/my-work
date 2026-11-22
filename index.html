@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #2350f5;
+    --bg-deep: #1a3fd0;
+    --ink: #fff;
+    --badge: #ffe14d;
+    --card: #ffffff;
+    --card-ink: #14192e;
+    --muted: #5b6380;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(circle at 20% 0%, #3a66ff 0, transparent 50%),
+                      radial-gradient(circle at 90% 100%, var(--bg-deep) 0, transparent 50%);
+    color: var(--ink);
+    font-family: Inter, system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ---------- top bar ---------- */
+  .badge {
+    position: fixed; top: -40px; left: -40px;
+    width: 170px; height: 130px;
+    background: var(--badge); color: #111;
+    border-radius: 0 0 90px 0;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0 0 22px 52px;
+    font: 700 18px Unbounded, sans-serif;
+    z-index: 5; transform: rotate(-4deg);
+  }
+  .top-actions {
+    position: fixed; top: 16px; right: 16px; display: flex; gap: 8px; z-index: 5;
+  }
+  .pill {
+    border: 1.5px solid rgba(255,255,255,.55); background: transparent; color: #fff;
+    border-radius: 999px; padding: 6px 12px; font: 500 13px Inter; cursor: pointer;
+  }
+  .pill:hover { background: rgba(255,255,255,.15); }
+  .search {
+    width: 170px; outline: none;
+  }
+  .search::placeholder { color: rgba(255,255,255,.7); }
+
+  /* ---------- header ---------- */
+  header {
+    text-align: center; padding: 110px 16px 10px;
+  }
+  header h1 {
+    font: 700 clamp(28px, 5vw, 48px)/1.1 Unbounded, sans-serif; margin: 0 0 10px;
+  }
+  header p { margin: 0; opacity: .85; font-size: 16px; }
+
+  /* ---------- folders grid ---------- */
+  .grid {
+    max-width: 980px; margin: 40px auto 80px; padding: 0 16px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 56px 48px;
+  }
+  .folder {
+    width: 170px; background: none; border: 0; padding: 0; cursor: pointer;
+    color: #fff; font: 600 15px Inter; text-align: center;
+  }
+  .folder .shape {
+    position: relative; width: 170px; height: 150px; margin-bottom: 14px;
+    perspective: 600px;
+  }
+  .folder .back {
+    position: absolute; inset: 22px 0 0 0; border-radius: 14px;
+    background: var(--back);
+  }
+  .folder .back::before { /* tab */
+    content: ""; position: absolute; top: -14px; left: 0;
+    width: 64px; height: 24px; border-radius: 10px 10px 0 0; background: var(--back);
+  }
+  .folder .stickers {
+    position: absolute; left: 0; right: 0; top: -6px; height: 84px;
+    display: flex; justify-content: center; align-items: flex-end; gap: 2px;
+  }
+  .folder .stickers span {
+    font-size: 44px; line-height: 1;
+    filter: drop-shadow(0 3px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 6px 8px rgba(0,0,0,.25));
+    transition: transform .35s cubic-bezier(.3,1.6,.5,1);
+  }
+  .folder .stickers span:nth-child(1) { transform: rotate(-12deg) translateY(6px); }
+  .folder .stickers span:nth-child(2) { transform: translateY(-6px); font-size: 50px; }
+  .folder .stickers span:nth-child(3) { transform: rotate(12deg) translateY(8px); }
+  .folder .front {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 92px;
+    border-radius: 14px; background: var(--color);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.5), 0 10px 24px rgba(0,0,0,.18);
+    transform-origin: bottom center;
+    transition: transform .3s ease;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(0,0,0,.35); font: 700 13px Unbounded;
+  }
+  .folder:hover .front, .folder:focus-visible .front { transform: rotateX(-22deg); }
+  .folder:hover .stickers span:nth-child(1) { transform: rotate(-20deg) translate(-8px, -14px); }
+  .folder:hover .stickers span:nth-child(2) { transform: translateY(-26px) scale(1.08); }
+  .folder:hover .stickers span:nth-child(3) { transform: rotate(20deg) translate(8px, -12px); }
+  .folder:focus-visible { outline: 3px solid var(--badge); outline-offset: 8px; border-radius: 12px; }
+  .folder.hidden { display: none; }
+
+  /* ---------- open folder panel ---------- */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(10, 20, 70, .55);
+    backdrop-filter: blur(6px); display: none; z-index: 10;
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .overlay.open { display: flex; animation: fade .2s ease; }
+  .panel {
+    width: min(860px, 100%); max-height: 88vh; overflow: auto;
+    background: var(--color); color: var(--card-ink);
+    border-radius: 22px; padding: 28px; position: relative;
+    animation: pop .3s cubic-bezier(.3,1.4,.5,1);
+  }
+  .panel-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .panel-head .emoji { font-size: 40px; }
+  .panel-head h2 { font: 700 26px Unbounded; margin: 0; }
+  .panel-head small { color: rgba(0,0,0,.55); font-size: 14px; }
+  .lock { display: flex; flex-wrap: wrap; gap: 10px; }
+  .lock input { flex: 1; min-width: 180px; padding: 12px 16px; border-radius: 999px; border: 0; font: 500 15px Inter; }
+  .lock button, .vbox .load { padding: 12px 20px; border-radius: 999px; border: 0; background: var(--card-ink); color: #fff; font: 600 15px Inter; cursor: pointer; }
+  .lock-msg { width: 100%; margin: 0; min-height: 1.2em; font-size: 14px; font-weight: 600; }
+  .vbox { aspect-ratio: 16 / 9; border-radius: 10px; background: #14192e; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .vbox video { width: 100%; height: 100%; }
+  .vbox .load { background: #fff; color: var(--card-ink); }
+  .vbox .load small { opacity: .6; margin-left: 6px; }
+  .vbox .load:disabled { cursor: progress; }
+  .close {
+    margin-left: auto; width: 40px; height: 40px; border-radius: 50%;
+    border: 0; background: rgba(0,0,0,.12); font-size: 20px; cursor: pointer;
+  }
+  .close:hover { background: rgba(0,0,0,.2); }
+  .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+  .project {
+    background: var(--card); border-radius: 16px; padding: 18px;
+    box-shadow: 0 4px 0 rgba(0,0,0,.08); display: flex; flex-direction: column; gap: 8px;
+    transition: transform .2s;
+  }
+  .project:hover { transform: translateY(-3px); }
+  .projects.wide { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+  .project video { width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; background: #000; display: block; }
+  .project h3 { margin: 0; font-size: 17px; }
+  .project .year { color: var(--muted); font-size: 12px; font-weight: 600; }
+  .project p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { background: #eef1ff; color: #2350f5; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+  .links { display: flex; gap: 8px; margin-top: 4px; }
+  .links a {
+    font-size: 13px; font-weight: 600; color: var(--card-ink); text-decoration: none;
+    border: 1.5px solid #d6dbef; padding: 5px 11px; border-radius: 999px;
+  }
+  .links a:hover { background: var(--card-ink); color: #fff; border-color: var(--card-ink); }
+
+  footer { text-align: center; opacity: .7; font-size: 13px; padding-bottom: 30px; }
+
+  @keyframes fade { from { opacity: 0 } }
+  @keyframes pop { from { transform: scale(.9) translateY(20px); opacity: 0 } }
+
+  @media (max-width: 520px) {
+    .grid { gap: 40px 20px; }
+    .folder, .folder .shape { width: 140px; }
+    .projects.wide { grid-template-columns: 1fr; }
+    .folder .stickers span { font-size: 36px; }
+    .search { width: 120px; }
+    .panel { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="badge">#mywork</div>
+  <div class="top-actions">
+    <input class="pill search" id="search" type="search" placeholder="Search projects…" aria-label="Search projects">
+  </div>
+
+  <header>
+    <h1>My Work</h1>
+    <p>Everything I've built, designed and written — sorted into folders.</p>
+  </header>
+
+  <main class="grid" id="grid"></main>
+
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true">
+    <div class="panel" id="panel"></div>
+  </div>
+
+  <footer><span id="count"></span> projects · last updated <span id="updated"></span></footer>
+
+<script src="projects.js"></script>
+<script>
+  const grid = document.getElementById("grid");
+  const overlay = document.getElementById("overlay");
+  const panel = document.getElementById("panel");
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const unlocked = {};   // folder id -> { key, projects }
+  const keyCache = {};   // password -> CryptoKey (avoid re-deriving)
+
+  async function deriveKey(pw) {
+    if (keyCache[pw]) return keyCache[pw];
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
+    return keyCache[pw] = await crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt: unb64(VAULT.salt), iterations: VAULT.iter, hash: "SHA-256" },
+      base, { name: "AES-CBC", length: 256 }, false, ["decrypt"]);
+  }
+  const decrypt = (key, iv, data) => crypto.subtle.decrypt({ name: "AES-CBC", iv }, key, data);
+
+  // Render folders
+  FOLDERS.forEach(f => {
+    const btn = document.createElement("button");
+    btn.className = "folder";
+    btn.dataset.id = f.id;
+    btn.style.setProperty("--color", f.color);
+    btn.style.setProperty("--back", f.back);
+    btn.innerHTML = `
+      <div class="shape">
+        <div class="back"></div>
+        <div class="stickers">${f.stickers.map(s => `<span>${s}</span>`).join("")}</div>
+        <div class="front">🔒 ${f.count}</div>
+      </div>
+      ${esc(f.name)}`;
+    btn.addEventListener("click", () => unlocked[f.id] ? openFolder(f) : askPassword(f));
+    grid.appendChild(btn);
+  });
+
+  function showPanel(f, html) {
+    panel.style.setProperty("--color", f.color);
+    panel.innerHTML = html;
+    panel.querySelector(".close").onclick = closeFolder;
+    overlay.classList.add("open");
+  }
+
+  function askPassword(f) {
+    showPanel(f, `
+      <div class="panel-head">
+        <span class="emoji">🔒</span>
+        <div><h2>${esc(f.name)}</h2><small>This folder is password protected</small></div>
+        <button class="close" aria-label="Close">✕</button>
+      </div>
+      <form class="lock">
+        <input type="password" placeholder="Enter password" aria-label="Password" autocomplete="current-password" required>
+        <button type="submit">Unlock</button>
+        <p class="lock-msg" role="alert"></p>
+      </form>`);
+    const form = panel.querySelector(".lock"), input = form.querySelector("input"), msg = form.querySelector(".lock-msg");
+    input.focus();
+    form.onsubmit = async e => {
+      e.preventDefault();
+      msg.textContent = "Checking…";
+      try {
+        const key = await deriveKey(input.value);
+        const plain = await decrypt(key, unb64(f.enc.iv), unb64(f.enc.ct));
+        unlocked[f.id] = { key, projects: JSON.parse(new TextDecoder().decode(plain)) };
+        grid.querySelector(`[data-id="${f.id}"] .front`).textContent = f.count;
+        openFolder(f);
+      } catch {
+        msg.textContent = "Wrong password, try again.";
+        input.select();
+      }
+    };
+  }
+
+  function projectCard(p, i) {
+    const links = [
+      p.link && `<a href="${esc(p.link)}" target="_blank" rel="noopener">Live ↗</a>`,
+      p.repo && `<a href="${esc(p.repo)}" target="_blank" rel="noopener">Code</a>`,
+    ].filter(Boolean).join("");
+    const video = p.video ? `
+      <div class="vbox" data-i="${i}">
+        <button class="load">▶ Play video <small>${Math.round(p.video.size / 1e6)} MB</small></button>
+      </div>` : "";
+    return `
+      <article class="project">
+        ${video}
+        <span class="year">${esc(p.year)}</span>
+        <h3>${esc(p.title)}</h3>
+        <p>${esc(p.desc)}</p>
+        <div class="tags">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+        ${links ? `<div class="links">${links}</div>` : ""}
+      </article>`;
+  }
+
+  async function loadVideo(box, v, key) {
+    const btn = box.querySelector(".load");
+    btn.disabled = true;
+    try {
+      const parts = [];
+      for (let n = 0; n < v.parts.length; n++) {
+        btn.innerHTML = `Loading… ${Math.round(n / v.parts.length * 100)}%`;
+        const res = await fetch(v.parts[n].f);
+        if (!res.ok) throw new Error(res.status);
+        parts.push(await decrypt(key, unb64(v.parts[n].iv), await res.arrayBuffer()));
+      }
+      const url = URL.createObjectURL(new Blob(parts, { type: v.type }));
+      box.innerHTML = `<video controls playsinline autoplay src="${url}"></video>`;
+    } catch {
+      btn.disabled = false;
+      btn.textContent = "Couldn't load video — tap to retry";
+    }
+  }
+
+  function openFolder(f) {
+    const { key, projects: list } = unlocked[f.id];
+    showPanel(f, `
+      <div class="panel-head">
+        <span class="emoji">${f.stickers[0]}</span>
+        <div><h2>${esc(f.name)}</h2><small>${list.length} project${list.length === 1 ? "" : "s"}</small></div>
+        <button class="close" aria-label="Close">✕</button>
+      </div>
+      <div class="projects${list.some(p => p.video) ? " wide" : ""}">${list.map(projectCard).join("")}</div>`);
+    panel.querySelectorAll(".vbox").forEach(box =>
+      box.querySelector(".load").onclick = () => loadVideo(box, list[box.dataset.i].video, key));
+    panel.querySelector(".close").focus();
+  }
+  function closeFolder() {
+    overlay.classList.remove("open");
+    panel.querySelectorAll("video").forEach(v => v.pause());
+  }
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeFolder(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeFolder(); });
+
+  // Search: folder names always; project details only in unlocked folders
+  document.getElementById("search").addEventListener("input", e => {
+    const q = e.target.value.trim().toLowerCase();
+    FOLDERS.forEach(f => {
+      const projects = unlocked[f.id]?.projects || [];
+      const hit = !q || f.name.toLowerCase().includes(q) ||
+        projects.some(p => [p.title, p.desc, ...p.tags].join(" ").toLowerCase().includes(q));
+      grid.querySelector(`[data-id="${f.id}"]`).classList.toggle("hidden", !hit);
+    });
+  });
+
+  document.getElementById("count").textContent = FOLDERS.reduce((n, f) => n + f.count, 0);
+  document.getElementById("updated").textContent = new Date(document.lastModified).toLocaleDateString();
+</script>
+</body>
+</html>
