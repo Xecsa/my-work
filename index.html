@@ -135,6 +135,14 @@
   .vbox .load { background: #fff; color: var(--card-ink); }
   .vbox .load small { opacity: .6; margin-left: 6px; }
   .vbox .load:disabled { cursor: progress; }
+  .ibox { border-radius: 10px; background: #eef1ff; min-height: 120px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; overflow: hidden; }
+  .ibox img { width: 100%; display: block; }
+  .ibox a { display: block; width: 100%; cursor: zoom-in; }
+  .files { display: flex; flex-wrap: wrap; gap: 6px; }
+  .file { border: 1.5px solid #d6dbef; background: #fff; color: var(--card-ink); border-radius: 999px; padding: 5px 11px; font: 600 13px Inter; cursor: pointer; text-align: left; }
+  .file:hover { background: var(--card-ink); color: #fff; border-color: var(--card-ink); }
+  .file small { opacity: .6; margin-left: 4px; font-weight: 500; }
+  .file:disabled { cursor: progress; opacity: .7; }
   .close {
     margin-left: auto; width: 40px; height: 40px; border-radius: 50%;
     border: 0; background: rgba(0,0,0,.12); font-size: 20px; cursor: pointer;
@@ -154,7 +162,9 @@
   .project p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; flex: 1; }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; }
   .tag { background: #eef1ff; color: #2350f5; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
-  .links { display: flex; gap: 8px; margin-top: 4px; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .links a { white-space: nowrap; }
+  .project.has-image { grid-column: span 2; }
   .links a {
     font-size: 13px; font-weight: 600; color: var(--card-ink); text-decoration: none;
     border: 1.5px solid #d6dbef; padding: 5px 11px; border-radius: 999px;
@@ -170,6 +180,7 @@
     .grid { gap: 40px 20px; }
     .folder, .folder .shape { width: 140px; }
     .projects.wide { grid-template-columns: 1fr; }
+    .project.has-image { grid-column: auto; }
     .folder .stickers span { font-size: 36px; }
     .search { width: 120px; }
     .panel { padding: 20px; }
@@ -195,7 +206,7 @@
 
   <footer><span id="count"></span> projects · last updated <span id="updated"></span></footer>
 
-<script src="projects.js?v=2"></script>
+<script src="projects.js?v=3"></script>
 <script>
   const grid = document.getElementById("grid");
   const overlay = document.getElementById("overlay");
@@ -273,34 +284,66 @@
     const links = [
       p.link && `<a href="${esc(p.link)}" target="_blank" rel="noopener">Live ↗</a>`,
       p.repo && `<a href="${esc(p.repo)}" target="_blank" rel="noopener">Code</a>`,
+      ...(p.links || []).map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`),
     ].filter(Boolean).join("");
+    const image = p.image ? `<div class="ibox" data-i="${i}">Loading image…</div>` : "";
+    const sizeLabel = n => n >= 1e6 ? `${(n / 1e6).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1e3))} KB`;
+    const files = p.files ? `<div class="files">${p.files.map((f, j) =>
+      `<button class="file" data-i="${i}" data-j="${j}">⬇ ${esc(f.name)}<small>${sizeLabel(f.size)}</small></button>`).join("")}</div>` : "";
     const video = p.video ? `
       <div class="vbox" data-i="${i}">
         <button class="load">▶ Play video <small>${Math.round(p.video.size / 1e6)} MB</small></button>
       </div>` : "";
     return `
-      <article class="project">
-        ${video}
+      <article class="project${p.image ? " has-image" : ""}">
+        ${video}${image}
         <span class="year">${esc(p.year)}</span>
         <h3>${esc(p.title)}</h3>
         <p>${esc(p.desc)}</p>
         <div class="tags">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+        ${files}
         ${links ? `<div class="links">${links}</div>` : ""}
       </article>`;
+  }
+
+  // Fetch + decrypt an encrypted asset ({type, parts:[{f, iv}]}) into a Blob
+  async function fetchAsset(a, key, onProgress = () => {}) {
+    const parts = [];
+    for (let n = 0; n < a.parts.length; n++) {
+      onProgress(n / a.parts.length);
+      const res = await fetch(a.parts[n].f);
+      if (!res.ok) throw new Error(res.status);
+      parts.push(await decrypt(key, unb64(a.parts[n].iv), await res.arrayBuffer()));
+    }
+    return new Blob(parts, { type: a.type });
+  }
+
+  async function loadImage(box, img, key) {
+    try {
+      const url = URL.createObjectURL(await fetchAsset(img, key));
+      box.innerHTML = `<a href="${url}" target="_blank" rel="noopener" title="Open full size"><img src="${url}" alt="${esc(img.alt || "")}"></a>`;
+    } catch { box.textContent = "Couldn't load image"; }
+  }
+
+  async function downloadFile(btn, f, key) {
+    const label = btn.innerHTML;
+    btn.disabled = true;
+    try {
+      const url = URL.createObjectURL(await fetchAsset(f, key));
+      const a = Object.assign(document.createElement("a"), { href: url, download: f.name });
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      btn.innerHTML = label;
+    } catch { btn.textContent = "Download failed — retry"; }
+    btn.disabled = false;
   }
 
   async function loadVideo(box, v, key) {
     const btn = box.querySelector(".load");
     btn.disabled = true;
     try {
-      const parts = [];
-      for (let n = 0; n < v.parts.length; n++) {
-        btn.innerHTML = `Loading… ${Math.round(n / v.parts.length * 100)}%`;
-        const res = await fetch(v.parts[n].f);
-        if (!res.ok) throw new Error(res.status);
-        parts.push(await decrypt(key, unb64(v.parts[n].iv), await res.arrayBuffer()));
-      }
-      const url = URL.createObjectURL(new Blob(parts, { type: v.type }));
+      const blob = await fetchAsset(v, key, f => btn.innerHTML = `Loading… ${Math.round(f * 100)}%`);
+      const url = URL.createObjectURL(blob);
       box.innerHTML = `<video controls playsinline autoplay src="${url}"></video>`;
     } catch {
       btn.disabled = false;
@@ -319,6 +362,9 @@
       <div class="projects${list.some(p => p.video) ? " wide" : ""}">${list.map(projectCard).join("")}</div>`);
     panel.querySelectorAll(".vbox").forEach(box =>
       box.querySelector(".load").onclick = () => loadVideo(box, list[box.dataset.i].video, key));
+    panel.querySelectorAll(".ibox").forEach(box => loadImage(box, list[box.dataset.i].image, key));
+    panel.querySelectorAll(".file").forEach(btn =>
+      btn.onclick = () => downloadFile(btn, list[btn.dataset.i].files[btn.dataset.j], key));
     panel.querySelector(".close").focus();
   }
   function closeFolder() {
