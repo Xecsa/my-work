@@ -18,6 +18,22 @@ window.FOLDERS = [
   }
  },
  {
+  "id": "fleet-finance",
+  "name": "Fleet Finance",
+  "color": "#b79cff",
+  "back": "#cfbfff",
+  "stickers": [
+   "🚚",
+   "💰",
+   "📈"
+  ],
+  "count": 1,
+  "enc": {
+   "iv": "3aB5pKVckkIfxtOvoeCgRg==",
+   "ct": "te48Nw7llmtgp+PJo/AncAPhB034W89xKjZ5L26bRj+aXbkvQzQqPPvdquhHvJO0zKUUIptvfBobtPL69VIb1RidVRTk4Zol+dW3UmcdbiooB7c/B7sUaOFliFByJ0qxdv0qi8JRdeX4Vng2WXTXf1kXngsZ4O+apNNij95TdjdJRi7ok0vEqJmWoGhsZnM+CuQWgJid76fieipxKyVZ0L9ETWJD4QAd5sXnXfirKhmh31kROxjsXQZXzp9XTQIMMSZNvikV4n+hvL1PlH1+gyIZTkUQYwNG1OXbsuhydsh0HaF31GB9gZVNoHyIA5XlVbbI4rmaXZwTUmRls3hr7I/gwoEa3tQ5E/4jn7Sf7pZKjWCEcMkDUJjWtsME4U5JWhQP6U95UXmWcAOpQRJjDw=="
+  }
+ },
+ {
   "id": "web",
   "name": "Web Dev",
   "color": "#7aa2ff",
