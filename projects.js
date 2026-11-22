@@ -82,6 +82,22 @@ window.FOLDERS = [
   }
  },
  {
+  "id": "saba",
+  "name": "Saba",
+  "color": "#ffa8c5",
+  "back": "#ffc9db",
+  "stickers": [
+   "👩‍💻",
+   "📱",
+   "✅"
+  ],
+  "count": 1,
+  "enc": {
+   "iv": "FVWL5+YrnYf7cyYAmTVW/Q==",
+   "ct": "s6mNb00hufHQDmlvtCD89w2HlXJ8xye/cr4tx2RvK8+GyHMkRR6Jx8riVWkyARo42LR6bCK21eLqoi/ScMLYGIaDyBQvn5mp8x/jYvuFo5fW7WEK+kpNLARZA4Gexmlm7/Slx2ZP7wG8QnTZpblBAF/hNNQTEBwV9P8T3u385C0aNJk9FA/4cMUbieTp8jHRFcMy56dzsPEeD+b0RRTYmFL330Z8hkl67T3rVueqo64="
+  }
+ },
+ {
   "id": "web",
   "name": "Web Dev",
   "color": "#7aa2ff",
